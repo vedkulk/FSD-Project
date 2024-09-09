@@ -4,16 +4,36 @@ import Background from "@/assets/login2.png"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { toast } from 'sonner'
 
 const Auth = () => {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  
+  const validateSignUp = () =>{
+    if(!email.length)
+    {
+      toast.error("Email is required.");
+      return false;
+    }
+    if(!password.length)
+    {
+      toast.error("Password is required.");
+      return false;
+    }
+    if(password!==confirmPassword)
+    {
+      toast.error("Password must be the same.");
+      return false;
+    }
+    return true
+  }
   const handleLogin = async ()=>{
 
   }
   const handleSignup = async ()=>{
-    
+    if(validateSignUp()){alert("done")}
   }
   return (
     <div className="h-screen w-screen flex items-center justify-center">
