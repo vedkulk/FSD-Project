@@ -5,6 +5,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@radix-ui/react-tabs'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
+import {apiClient} from "@/lib/api-client"
+import { SIGNUP_ROUTE } from '@/utils/constants'
 
 const Auth = () => {
   const [email, setEmail] = useState("")
@@ -33,8 +35,11 @@ const Auth = () => {
 
   }
   const handleSignup = async ()=>{
-    if(validateSignUp()){alert("done")}
-  }
+    if(validateSignUp()){
+      const response = await apiClient.post(SIGNUP_ROUTE,{email, password});
+      console.log({response});
+    }
+  };
   return (
     <div className="h-screen w-screen flex items-center justify-center">
       <div className="h-[80vh] bg-white border-2 border-white text-opacity-90 shadow-2xl w-[80vw] md:w-[90vw] lg:w-[70vw] xl:w-[60vw] rounded-3xl grid xl:grid-cols-2">
