@@ -7,22 +7,70 @@ import { colors, getColor } from '@/lib/utils';
 import {FaTrash, FaPlus} from 'react-icons/fa'
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { apiClient } from '@/lib/api-client';
+import { UPDATE_PROFILE_ROUTE } from '@/utils/constants';
+import { useEffect } from 'react';
 
 const Profile = () => {
   const navigate = useNavigate();
   const {userInfo, setUserInfo} = useAppStore()
-  const [firstName, setFirstName] = useState("")
-  const [lastName, setLastName] = useState("")
+  const [firstName, setFirstName] = useState(userInfo.firstName || "")
+  const [lastName, setLastName] = useState(userInfo.lastName || "")
+  const [selectedColor, setSelectedColor] = useState(userInfo.color || 0)
   const [image, setImage] = useState(null)
   const [hovered, setHovered] = useState(false)
-  const [selectedColor, setSelectedColor] = useState(0)
-  const saveChanges = async () => {}
+  
+  useEffect(() => {
+    if(userInfo.profileSetup){
+      setFirstName(userInfo.firstName)
+      setLastName(userInfo.lastName)
+      setSelectedColor(userInfo.color)
+    }
+  }, [userInfo])
+  
+  const validateProfile = () => {
+    if(!firstName){
+      toast.error("First name is required.")
+      return false
+    }
+    if(!lastName){
+      toast.error("Last name is required.")
+      return false
+    }
+    return true
+  }
+  const saveChanges = async () => {
+    if(validateProfile()){
+      try {
+        const response = await apiClient.post(UPDATE_PROFILE_ROUTE,
+          {firstName, lastName, color:selectedColor},
+          {withCredentials:true})
+          if(response.status===200 && response.data){
+            setUserInfo({...response.data})
+            toast.success("Profile updated successfully")
+            navigate("/chat")
+            console.log({response});
+          }
+      } catch (error) {
+        console.log(error)
+      }
+    }
+  }
 
+  const handleNavigate = () => {
+    if(userInfo.profileSetup){
+      navigate("/chat")
+    }
+    else{
+      toast.error("Please setup profile.")
+    }
+  }
   return (
         <div className="bg-[#1b1c24] min-h-screen flex items-center justify-center flex-col gap-10 p-4">
           <div className="flex flex-col gap-10 w-full max-w-3xl">
             <div>
-              <IoArrowBack className="text-4xl lg:text-4xl text-white/90 cursor-pointer" />
+              <IoArrowBack className="text-4xl lg:text-4xl text-white/90 cursor-pointer" onClick={handleNavigate} />
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div
