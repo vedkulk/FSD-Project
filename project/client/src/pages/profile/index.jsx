@@ -9,8 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { apiClient } from '@/lib/api-client';
-import { UPDATE_PROFILE_ROUTE } from '@/utils/constants';
+import { ADD_PROFILE_IMAGE_ROUTE, UPDATE_PROFILE_ROUTE } from '@/utils/constants';
 import { useEffect } from 'react';
+import { useRef } from 'react';
 
 const Profile = () => {
   const navigate = useNavigate();
@@ -20,7 +21,8 @@ const Profile = () => {
   const [selectedColor, setSelectedColor] = useState(userInfo.color || 0)
   const [image, setImage] = useState(null)
   const [hovered, setHovered] = useState(false)
-  
+  const fileInputRef = useRef(null)
+
   useEffect(() => {
     if(userInfo.profileSetup){
       setFirstName(userInfo.firstName)
@@ -66,6 +68,25 @@ const Profile = () => {
       toast.error("Please setup profile.")
     }
   }
+  const handleFileInputClick = () => {
+    fileInputRef.current.click();
+  }
+  const handleImageChange = async(event) => {
+    const file = event.target.files[0]
+    console.group(file)
+    if(file){
+      const formData = new FormData();
+      formData.append("profile-image", file)
+      const response = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE, formData, {withCredentials:true})
+      if(response.status===200&&response.data.image){
+        setUserInfo({...userInfo, image:response.data.image})
+        toast.success("Image updated successfully")
+      }
+    }
+  }
+  const handleDeleteImage = async()=>{
+
+  }
   return (
         <div className="bg-[#1b1c24] min-h-screen flex items-center justify-center flex-col gap-10 p-4">
           <div className="flex flex-col gap-10 w-full max-w-3xl">
@@ -88,10 +109,18 @@ const Profile = () => {
               )}
               </Avatar>
               {hovered && (
-                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer">
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer" onClick={image ? handleDeleteImage : handleFileInputClick}>
                   {image ? <FaTrash className="text-white text-3xl" /> : <FaPlus className="text-white text-3xl" />}
                 </div>
               )}
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                className="hidden" 
+                onChange={handleImageChange} 
+                name="profile-image" 
+                accept=".png, .jpg, .jpeg, .svg, .webp">
+              </input>
             </div>
             <div className='flex min-w-32 md:min-w-64 flex-col gap-5 text-white items-center justify-center '>
                 <div className='w-full'>
