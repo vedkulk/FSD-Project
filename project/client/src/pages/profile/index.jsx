@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { apiClient } from '@/lib/api-client';
-import { ADD_PROFILE_IMAGE_ROUTE, UPDATE_PROFILE_ROUTE } from '@/utils/constants';
+import { ADD_PROFILE_IMAGE_ROUTE, UPDATE_PROFILE_ROUTE, REMOVE_PROFILE_IMAGE_ROUTE, HOST } from '@/utils/constants';
 import { useEffect } from 'react';
 import { useRef } from 'react';
 
@@ -29,6 +29,10 @@ const Profile = () => {
       setLastName(userInfo.lastName)
       setSelectedColor(userInfo.color)
     }
+    if (userInfo.image) {
+      setImage(`${HOST}/${userInfo.image}`);
+      console.log(userInfo.image)
+    }    
   }, [userInfo])
   
   const validateProfile = () => {
@@ -78,14 +82,25 @@ const Profile = () => {
       const formData = new FormData();
       formData.append("profile-image", file)
       const response = await apiClient.post(ADD_PROFILE_IMAGE_ROUTE, formData, {withCredentials:true})
-      if(response.status===200&&response.data.image){
+      if(response.status===200 && response.data.image){
         setUserInfo({...userInfo, image:response.data.image})
         toast.success("Image updated successfully")
       }
     }
   }
   const handleDeleteImage = async()=>{
-
+    try {
+      const response = await apiClient.delete(REMOVE_PROFILE_IMAGE_ROUTE,{
+        withCredentials: true,
+      })
+      if(response.status===200){
+        setUserInfo({...userInfo, image:null})
+        toast.success("Image deleted successfully")
+        setImage(null)
+      }
+    } catch (error) {
+      console.log(error)
+    }
   }
   return (
         <div className="bg-[#1b1c24] min-h-screen flex items-center justify-center flex-col gap-10 p-4">
