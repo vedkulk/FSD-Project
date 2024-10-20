@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom"
 import { toast } from "sonner"
 import ChatContainer from "./components/chat-container"
 import ContactsContainer from "./components/contacts-container"
-import EmptyChatContainer from "./components/empty-chat-container copy"
+import EmptyChatContainer from "./components/empty-chat-container"
 
 const Chat = () => {
   const {userInfo} = useAppStore()
@@ -18,7 +18,7 @@ const Chat = () => {
   return (
     <div className="flex h-[100vh] text-white overflow-hidden">
       <ContactsContainer/>
-      <EmptyChatContainer/>
+      {/*<EmptyChatContainer/>*/}
       <ChatContainer/>
     </div>
     )
