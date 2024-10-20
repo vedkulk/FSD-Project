@@ -1,32 +1,43 @@
-import EmojiPicker from 'emoji-picker-react'
-import { useEffect, useRef, useState } from 'react'
-import { GrAttachment } from "react-icons/gr"
-import { IoSend } from 'react-icons/io5'
-import { RiEmojiStickerLine } from 'react-icons/ri'
+import EmojiPicker from 'emoji-picker-react';
+import { useEffect, useRef, useState } from 'react';
+import { GrAttachment } from "react-icons/gr";
+import { IoSend } from 'react-icons/io5';
+import { RiEmojiStickerLine } from 'react-icons/ri';
 
 const MessageBar = () => {
-  const emojiRef = useRef()
-  const [message, setMessage] = useState("")
-  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false)
+  const emojiRef = useRef();
+  const [message, setMessage] = useState("");
+  const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
-  useEffect(()=>{
-    function handleClickOutside(event){
-      if(emojiRef.current && !emojiRef.current.contains(event.target)){
-        setEmojiPickerOpen(false)
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (emojiRef.current && !emojiRef.current.contains(event.target)) {
+        setEmojiPickerOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return()=>{
-      document.removeEventListener("mousedown")
-    }
-  },[emojiRef])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside); // Fix cleanup
+    };
+  }, []);
+
   const handleAddEmoji = (emojiObject, event) => {
-    setMessage((msg) => msg + emojiObject.emoji)
-  }
+    setMessage((msg) => msg + emojiObject.emoji);
+  };
 
   const handleSendMessage = async () => {
-    // Send message logic
-  }
+    if (message.trim()) {
+      console.log("Message sent:", message); // Replace with actual send logic
+      setMessage(''); // Clear the input after sending
+    }
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault(); // Prevent new line
+      handleSendMessage();
+    }
+  };
 
   return (
     <div className='h-[10vh] bg-[#1c1d25] flex justify-center items-center px-8 mb-5 gap-6'>
@@ -37,12 +48,14 @@ const MessageBar = () => {
           placeholder='Enter message'
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyDown}
         />
         <button className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'>
           <GrAttachment className='text-2xl' />
         </button>
         <div className="relative">
           <button
+            aria-label="Open emoji picker"
             className='text-neutral-500 focus:border-none focus:outline-none focus:text-white duration-300 transition-all'
             onClick={() => setEmojiPickerOpen(!emojiPickerOpen)}
           >
@@ -52,7 +65,7 @@ const MessageBar = () => {
             <div className="absolute bottom-16 right-0" ref={emojiRef}>
               <EmojiPicker
                 theme='dark'
-                onEmojiClick={handleAddEmoji}  
+                onEmojiClick={handleAddEmoji}
                 autoFocusSearch={false}
               />
             </div>
@@ -67,7 +80,7 @@ const MessageBar = () => {
         <IoSend className='text-2xl' />
       </button>
     </div>
-  )
+  );
 }
 
-export default MessageBar
+export default MessageBar;
