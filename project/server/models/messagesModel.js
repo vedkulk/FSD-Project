@@ -22,16 +22,15 @@ const messageSchema = new mongoose.Schema({
             return this.messageType === "text";
         },
     },
-    fileUrl:{
-        type:String,
-        required:function(){
-            return this.messageType === "text";
-        },
+    fileUrl: {
+        type: String,
+        required: false, // Remove the required validation for now
     },
-    timestamp:{
-        time: Date,
-        default: Date.now
-    }
+    
+    timestamp: {
+        type: Date,            // Correctly specify the type
+        default: Date.now     // Set the default value to the current date and time
+    }    
 })
 
 const Message = mongoose.model("Messages", messageSchema)

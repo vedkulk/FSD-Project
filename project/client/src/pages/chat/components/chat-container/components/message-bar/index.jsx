@@ -1,3 +1,5 @@
+import { useSocket } from '@/context/SocketContext';
+import { useAppStore } from '@/store';
 import EmojiPicker from 'emoji-picker-react';
 import { useEffect, useRef, useState } from 'react';
 import { GrAttachment } from "react-icons/gr";
@@ -6,6 +8,8 @@ import { RiEmojiStickerLine } from 'react-icons/ri';
 
 const MessageBar = () => {
   const emojiRef = useRef();
+  const {selectedChatType, selectedChatData, userInfo} = useAppStore()
+  const socket = useSocket()
   const [message, setMessage] = useState("");
   const [emojiPickerOpen, setEmojiPickerOpen] = useState(false);
 
@@ -26,12 +30,16 @@ const MessageBar = () => {
   };
 
   const handleSendMessage = async () => {
-    if (message.trim()) {
-      console.log("Message sent:", message); // Replace with actual send logic
-      setMessage(''); // Clear the input after sending
+    if (selectedChatType==="contact") {
+     socket.emit("sendMessage",{
+      sender:userInfo.id,
+      content: message,
+      recipient: selectedChatData._id,
+      messageType:"text",
+      fileUrl:undefined
+     })
     }
   };
-
   const handleKeyDown = (e) => {
     if (e.key === 'Enter') {
       e.preventDefault(); // Prevent new line
